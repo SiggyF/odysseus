@@ -19,7 +19,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: ['.js', '.vue', '.json', '.glsl'],
     modules: [
       resolve('src'),
       resolve('node_modules')
@@ -28,7 +28,8 @@ module.exports = {
       'vue$': 'vue/dist/vue.common.js',
       'src': resolve('src'),
       'assets': resolve('src/assets'),
-      'components': resolve('src/components')
+      'components': resolve('src/components'),
+      'shaders': resolve('src/shaders')
     }
   },
   module: {
@@ -46,6 +47,11 @@ module.exports = {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: vueLoaderConfig
+      },
+      {
+        test: /\.glsl$/,
+        loader: 'webpack-glsl-loader',
+        include: [resolve('src'), resolve('shaders')]
       },
       {
         test: /\.js$/,

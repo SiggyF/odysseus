@@ -21,11 +21,12 @@
 </template>
 
 <script>
+var a = require('shaders/hello.glsl')
 export default {
   name: 'hello',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: a
     }
   }
 }
