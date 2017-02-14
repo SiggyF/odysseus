@@ -1,8 +1,8 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import VSphere from 'components/VSphere'
+import Vue from 'vue';
+import Router from 'vue-router';
+import VSphere from 'components/VSphere';
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   routes: [
@@ -12,4 +12,4 @@ export default new Router({
       component: VSphere
     }
   ]
-})
+});
