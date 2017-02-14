@@ -1,5 +1,5 @@
 import vert from 'shaders/sphere-vert.glsl';
-import frag from '../shaders/sphere-frag.glsl';
+import frag from 'shaders/sphere-frag.glsl';
 import $ from 'jquery';
 import _ from 'lodash';
 import * as THREE from 'three';
