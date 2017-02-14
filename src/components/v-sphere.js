@@ -6,39 +6,107 @@ import * as THREE from 'three';
 import Orbit from 'three-orbit-controls';
 var OrbitControls = Orbit(THREE);
 
-console.log('THREE', THREE);
-//
-
 export default {
   name: 'v-sphere',
-  data () {
+  data() {
     return {
+      width: 300,
+      height: 200,
+      nearClipping: 50,
+      farClipping: 1500
     };
   },
-  mounted(a) {
+  mounted() {
     this.setup();
+    this.listen();
+    this.bubble();
   },
   computed: {
     canvas: {
       get() {
-        return $(this.$el).find('#sphere-canvas')[0];
+        return $(this.$el).find('.sphere')[0];
+      },
+      cache: false
+    },
+    video: {
+      get() {
+        return $(this.$el).find('.depth')[0];
       },
       cache: false
     }
   },
   methods: {
+    listen() {
+      this.$on('video-loaded', this.loadTextures.bind(this));
+    },
+    bubble() {
+      this.video.addEventListener('loadedmetadata', (event) => {
+        this.$emit('video-loaded', event);
+      });
+    },
+    createTextures() {
+      let texture = new THREE.VideoTexture(this.video);
+      texture.minFilter = THREE.LinearFilter;
+      texture.format = THREE.RGBFormat;
+      return texture;
+    },
+    createGeometry() {
+      let geometry = new THREE.BufferGeometry();
+      let vertices = new Float32Array(this.width * this.height * 3);
+      for (var i = 0, j = 0, l = vertices.length; i < l; i += 3, j++) {
+        vertices[i] = j % this.width;
+        vertices[i + 1] = Math.floor(j / this.width);
+      }
+      geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+      return geometry;
+    },
+    createMaterial(geometry, texture) {
+      let material = new THREE.ShaderMaterial({
+        uniforms: {
+          videoMap: {value: texture},
+          width: {value: geometry.width},
+          height: {value: this.height},
+          nearClipping: {value: this.nearClipping},
+          farClipping: {value: this.farClipping},
+          pointSize: {value: 3},
+          zOffset: {value: 1000}
+        },
+        vertexShader: vert,
+        fragmentShader: frag,
+        depthTest: false,
+        depthWrite: false,
+        transparent: true
+      });
+
+      // MESH setup
+      var mesh = new THREE.Points(geometry, material);
+      this.scene.add(mesh);
+
+    },
     setup() {
-      //SCENE setup
+      // SCENE setup
       let scene = new THREE.Scene();
       scene.background = new THREE.Color(0x424242);
       var renderer = new THREE.WebGLRenderer({
         canvas: this.canvas
       });
-      var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
-      camera.target = new THREE.Vector3(0, 0, -1);
-      camera.position.set(-1000, 0, 0);
-      camera.lookAt(camera.target);
-      renderer.render(scene, camera);
+
+      let cameras = {
+        outside: new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000),
+        inside: new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1500)
+      };
+
+      cameras.outside.target = new THREE.Vector3(0, 0, -1);
+      cameras.outside.position.set(-1000, 0, 0);
+      cameras.outside.lookAt(cameras.outside.target);
+      cameras.inside.target = new THREE.Vector3(20, 0, 20);
+      cameras.inside.position.set(0, 0, 0);
+      cameras.inside.lookAt(cameras.inside.target);
+
+      renderer.render(scene, cameras.inside);
+      cameras.inside.helper = new THREE.CameraHelper(cameras.inside);
+      scene.add(cameras.inside.helper);
+
     },
     init() {
       var container;
