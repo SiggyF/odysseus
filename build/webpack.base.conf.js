@@ -19,7 +19,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json', '.glsl'],
+    extensions: ['.js', '.vue', '.json', '.glsl', '.scss'],
     modules: [
       resolve('src'),
       resolve('node_modules')
@@ -37,7 +37,7 @@ module.exports = {
       {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
-        enforce: "pre",
+        enforce: 'pre',
         include: [resolve('src'), resolve('test')],
         options: {
           formatter: require('eslint-friendly-formatter')
@@ -52,6 +52,25 @@ module.exports = {
         test: /\.glsl$/,
         loader: 'webpack-glsl-loader',
         include: [resolve('src'), resolve('shaders')]
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          {
+            loader: 'style-loader' // creates style nodes from JS strings
+          },
+          {
+            loader: 'css-loader' // translates CSS into CommonJS
+          },
+          {
+            loader: 'sass-loader' // compiles Sass to CSS
+          }
+        ],
+        include: [resolve('src')]
+      },
+      {
+        test: /\.html$/,
+        loader: 'html-loader'
       },
       {
         test: /\.js$/,
