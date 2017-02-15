@@ -10,6 +10,16 @@ export default {
   name: 'v-sphere',
   data() {
     return {
+      renderer: null,
+      cameras: null,
+      scene: null,
+      geometry: null,
+      isDragging: false,
+      x: null,
+      y: null,
+      lat: 0,
+      lon: 0,
+      selectedCamera: 'inside',
       width: 300,
       height: 200,
       nearClipping: 50,
@@ -17,9 +27,15 @@ export default {
     };
   },
   mounted() {
-    this.setup();
-    this.listen();
-    this.bubble();
+    this.scene = this.createScene();
+    this.cameras = this.createCameras();
+    this.scene.add(this.cameras.inside.helper);
+    this.renderer = this.createRenderer();
+    // create controls and add to camera
+    this.createControls();
+    this.geometry = this.createGeometry();
+    this.subscribe();
+    this.animate();
   },
   computed: {
     canvas: {
@@ -36,15 +52,30 @@ export default {
     }
   },
   methods: {
-    listen() {
-      this.$on('video-loaded', this.loadTextures.bind(this));
-    },
-    bubble() {
+    subscribe() {
       this.video.addEventListener('loadedmetadata', (event) => {
-        this.$emit('video-loaded', event);
+        let texture = this.createTexture();
+        let material = this.createMaterial(texture);
+        this.mesh = this.createMesh(this.geometry, material);
+        this.scene.add(this.mesh);
+      });
+      window.addEventListener('resize', (event) => {
+        this.onResize(event);
+      });
+      window.addEventListener('mousedown', (event) => {
+        this.onMouseDown(event);
+      });
+      window.addEventListener('mouseup', (event) => {
+        this.onMouseUp(event);
+      });
+      window.addEventListener('mousemove', (event) => {
+        this.onMouseMove(event);
       });
     },
-    createTextures() {
+    createControls() {
+      this.cameras.outside.controls = new OrbitControls(this.cameras.outside, this.renderer.domElement);
+    },
+    createTexture() {
       let texture = new THREE.VideoTexture(this.video);
       texture.minFilter = THREE.LinearFilter;
       texture.format = THREE.RGBFormat;
@@ -60,11 +91,11 @@ export default {
       geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
       return geometry;
     },
-    createMaterial(geometry, texture) {
+    createMaterial(texture) {
       let material = new THREE.ShaderMaterial({
         uniforms: {
           videoMap: {value: texture},
-          width: {value: geometry.width},
+          width: {value: this.width},
           height: {value: this.height},
           nearClipping: {value: this.nearClipping},
           farClipping: {value: this.farClipping},
@@ -77,20 +108,20 @@ export default {
         depthWrite: false,
         transparent: true
       });
-
-      // MESH setup
-      var mesh = new THREE.Points(geometry, material);
-      this.scene.add(mesh);
-
+      return material;
     },
-    setup() {
-      // SCENE setup
+    createMesh(geometry, material) {
+      // MESH setup
+      let mesh = new THREE.Points(geometry, material);
+      return mesh;
+    },
+    createScene() {
       let scene = new THREE.Scene();
       scene.background = new THREE.Color(0x424242);
-      var renderer = new THREE.WebGLRenderer({
-        canvas: this.canvas
-      });
-
+      return scene;
+    },
+    createCameras() {
+      // SCENE setup
       let cameras = {
         outside: new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000),
         inside: new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1500)
@@ -102,12 +133,73 @@ export default {
       cameras.inside.target = new THREE.Vector3(20, 0, 20);
       cameras.inside.position.set(0, 0, 0);
       cameras.inside.lookAt(cameras.inside.target);
-
-      renderer.render(scene, cameras.inside);
       cameras.inside.helper = new THREE.CameraHelper(cameras.inside);
-      scene.add(cameras.inside.helper);
-
+      return cameras;
     },
+    createRenderer() {
+      var renderer = new THREE.WebGLRenderer({
+        canvas: this.canvas
+      });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      return renderer;
+    },
+    animate() {
+      requestAnimationFrame(this.animate.bind(this));
+      if (_.isNil(this.mesh)) {
+        return;
+      }
+      this.render();
+      this.update();
+    },
+    render() {
+      this.renderer.render(this.scene, this.cameras.inside);
+    },
+    update() {
+      let radius = 20;
+      // clip
+      this.lat = Math.max(-85, Math.min(85, this.lat));
+      // moving the camera according to current latitude (vertical movement) and longitude (horizontal movement)
+      this.cameras.inside.target.x = (
+        radius * Math.sin(THREE.Math.degToRad(90 - this.lat)) * Math.cos(THREE.Math.degToRad(this.lon))
+      );
+      this.cameras.inside.target.y = (
+        radius * Math.cos(THREE.Math.degToRad(90 - this.lat))
+      );
+      this.cameras.inside.target.z = (
+        radius * Math.sin(THREE.Math.degToRad(90 - this.lat)) * Math.sin(THREE.Math.degToRad(this.lon))
+      );
+      this.cameras.inside.lookAt(this.cameras.inside.target);
+    },
+    onResize() {
+      this.cameras.inside.aspect = window.innerWidth / window.innerHeight;
+      this.cameras.inside.updateProjectionMatrix();
+      this.cameras.outside.aspect = window.innerWidth / window.innerHeight;
+      this.cameras.outside.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+    },
+    onMouseDown(event) {
+      this.isDragging = true;
+      if (this.selectedCamera === 'inside') {
+        event.preventDefault();
+        this.x = event.clientX;
+        this.y = event.clientY;
+        this.lon = 0;
+        this.lat = 0;
+      }
+    },
+    onMouseMove(event) {
+      if (this.selectedCamera === 'inside') {
+        if (this.isDragging) {
+          this.lon = (this.x - event.clientX) * 0.1 + this.lon;
+          this.lat = (event.clientY - this.y) * 0.1 + this.lat;
+        }
+      }
+    },
+    onMouseUp(event) {
+      this.isDragging = false;
+    },
+
     init() {
       var container;
       var geometry, mesh, material;

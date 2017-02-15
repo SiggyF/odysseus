@@ -1,5 +1,4 @@
-uniform sampler2D displacementMap;
-uniform sampler2D colorMap;
+uniform sampler2D videoMap;
 uniform float width, height;
 uniform float nearClipping, farClipping;
 uniform float pointSize;
@@ -32,7 +31,7 @@ vec4 flatToSphereProjection(float radius, vec2 uv, float z) {
 
 void main() {
   vUv = vec2(position.x / width, position.y * .5 / height);
-  vec4 textureVertex = texture2D(displacementMap, vUv);
+  vec4 textureVertex = texture2D(videoMap, vec2(vUv.x, vUv.y/2.0 + 0.5));
   float normalizedDepth = (textureVertex.r + textureVertex.g + textureVertex.b) / 3.0;
   float z = depthFromRangleInverse(1. - normalizedDepth, nearClipping, farClipping);
 
