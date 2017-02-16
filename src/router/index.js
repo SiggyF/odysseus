@@ -9,7 +9,10 @@ export default new Router({
     {
       path: '/',
       name: 'VSphere',
-      component: VSphere
+      component: VSphere,
+      props: {
+        src: 'static/video/leftyuv420.mp4'
+      }
     }
   ]
 });

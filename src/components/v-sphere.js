@@ -8,6 +8,12 @@ var OrbitControls = Orbit(THREE);
 
 export default {
   name: 'v-sphere',
+  props: {
+    src: {
+      required: true,
+      type: String
+    }
+  },
   data() {
     return {
       renderer: null,
@@ -19,9 +25,9 @@ export default {
       y: null,
       lat: 0,
       lon: 0,
-      selectedCamera: 'inside',
-      width: 300,
-      height: 200,
+      selectedCamera: 'outside',
+      width: 800,
+      height: 600,
       nearClipping: 50,
       farClipping: 1500
     };
@@ -29,7 +35,7 @@ export default {
   mounted() {
     this.scene = this.createScene();
     this.cameras = this.createCameras();
-    this.scene.add(this.cameras.inside.helper);
+    // this.scene.add(this.cameras.inside.helper);
     this.renderer = this.createRenderer();
     // create controls and add to camera
     this.createControls();
@@ -99,7 +105,8 @@ export default {
           height: {value: this.height},
           nearClipping: {value: this.nearClipping},
           farClipping: {value: this.farClipping},
-          pointSize: {value: 3},
+          pointSize: {value: 10},
+          opacity: {value: 0.3},
           zOffset: {value: 1000}
         },
         vertexShader: vert,
@@ -153,7 +160,7 @@ export default {
       this.update();
     },
     render() {
-      this.renderer.render(this.scene, this.cameras.inside);
+      this.renderer.render(this.scene, this.cameras[this.selectedCamera]);
     },
     update() {
       let radius = 20;
