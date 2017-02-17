@@ -17,13 +17,8 @@ vec4 flatToSphereProjection(float radius, vec2 uv, float z) {
   float newRadius = radius - z;
   // http://stackoverflow.com/questions/12732590/how-map-2d-grid-points-x-y-onto-sphere-as-3d-points-x-y-z
   float lon = uv.x * TwoPi;
-
-  // 2 * atan(exp(y/R)) - pi/2
-  // float lat = atan(uv.y) * TwoPi  ;
-  // uv.y -> 0 - 1
-  //
-  // float lat = atan(uv.y * Pi) * Pi + Pi/2.0 ;
-  float lat = -(uv.y - 0.5) * Pi;
+  // scale from [0, 1] to [-0.5pi, 0.5pi]
+  float lat = -(uv.y - 0.5) * Pi ;
 
   vec4 res = vec4(newRadius * cos(lat) * sin(lon), newRadius * sin(lat),
                   newRadius * cos(lat) * cos(lon), 1.);

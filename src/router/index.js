@@ -11,7 +11,7 @@ export default new Router({
       name: 'VSphere',
       component: VSphere,
       props: {
-        src: 'static/video/leftyuv420.mp4'
+        src: 'static/video/left.mp4'
       }
     }
   ]
