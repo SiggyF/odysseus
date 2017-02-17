@@ -20,7 +20,10 @@ vec4 flatToSphereProjection(float radius, vec2 uv, float z) {
 
   // 2 * atan(exp(y/R)) - pi/2
   // float lat = atan(uv.y) * TwoPi  ;
-  float lat = -atan(uv.y) * Pi + Pi/2.0 ;
+  // uv.y -> 0 - 1
+  //
+  // float lat = atan(uv.y * Pi) * Pi + Pi/2.0 ;
+  float lat = -(uv.y - 0.5) * Pi;
 
   vec4 res = vec4(newRadius * cos(lat) * sin(lon), newRadius * sin(lat),
                   newRadius * cos(lat) * cos(lon), 1.);
@@ -28,7 +31,7 @@ vec4 flatToSphereProjection(float radius, vec2 uv, float z) {
 }
 
 void main() {
-  vUv = vec2(position.x / width,  (position.y) / height);
+  vUv = vec2(position.x / width,  position.y / height);
   vec4 textureVertex = texture2D(videoMap, vec2(vUv.x, vUv.y/2.0));
   float normalizedDepth = (textureVertex.r + textureVertex.g + textureVertex.b) / 3.0;
   // compute depth from sphere inward
