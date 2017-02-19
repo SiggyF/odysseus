@@ -28,7 +28,7 @@ export default {
       selectedCamera: 'outside',
       width: 800,
       height: 600,
-      pointSize: 15,
+      pointSize: 25,
       nearClipping: 50,
       farClipping: 1500
     };
