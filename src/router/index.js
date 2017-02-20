@@ -13,6 +13,14 @@ export default new Router({
       props: {
         src: 'static/video/left.mp4'
       }
+    },
+    {
+      path: '/yuv',
+      name: 'VSphere',
+      component: VSphere,
+      props: {
+        src: 'static/video/leftyuv420.mp4'
+      }
     }
   ]
 });

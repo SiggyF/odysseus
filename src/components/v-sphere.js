@@ -26,11 +26,11 @@ export default {
       lat: 0,
       lon: 0,
       selectedCamera: 'outside',
-      width: 800,
-      height: 600,
+      width: 600,
+      height: 500,
       pointSize: 25,
-      nearClipping: 50,
-      farClipping: 1500
+      nearClipping: 70,
+      farClipping: 800
     };
   },
   mounted() {
@@ -112,7 +112,7 @@ export default {
         },
         vertexShader: vert,
         fragmentShader: frag,
-        depthTest: false,
+        depthTest: true,
         depthWrite: false,
         transparent: true
       });
@@ -131,8 +131,8 @@ export default {
     createCameras() {
       // SCENE setup
       let cameras = {
-        outside: new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000),
-        inside: new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1500)
+        outside: new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, this.farClipping * 10.0),
+        inside: new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, this.farClipping * 10.0)
       };
 
       cameras.outside.target = new THREE.Vector3(0, 0, 10);
@@ -199,8 +199,8 @@ export default {
     onMouseMove(event) {
       if (this.selectedCamera === 'inside') {
         if (this.isDragging) {
-          this.lon = (this.x - event.clientX) * 0.1 + this.lon;
-          this.lat = (event.clientY - this.y) * 0.1 + this.lat;
+          this.lon = (this.x - event.clientX) * 0.01 + this.lon;
+          this.lat = (event.clientY - this.y) * 0.01 + this.lat;
         }
       }
     },
