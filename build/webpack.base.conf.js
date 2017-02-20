@@ -19,7 +19,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json', '.glsl', '.scss'],
+    extensions: ['.js', '.vue', '.json', '.glsl', '.scss', '.styl', '.css'],
     modules: [
       resolve('src'),
       resolve('node_modules')
@@ -71,6 +71,12 @@ module.exports = {
       {
         test: /\.html$/,
         loader: 'html-loader'
+      },
+
+      {
+        test: /\.styl$/,
+        loader: ['style-loader', 'css-loader', 'stylus-loader'],
+        include: [resolve('src'), resolve('node_modules')]
       },
       {
         test: /\.js$/,

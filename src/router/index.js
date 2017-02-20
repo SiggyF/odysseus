@@ -8,7 +8,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'VSphere',
+      name: 'left',
       component: VSphere,
       props: {
         src: 'static/video/left.mp4'
@@ -16,7 +16,7 @@ export default new Router({
     },
     {
       path: '/yuv',
-      name: 'VSphere',
+      name: 'left-yuv',
       component: VSphere,
       props: {
         src: 'static/video/leftyuv420.mp4'
