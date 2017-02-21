@@ -38,6 +38,12 @@ void main() {
   // For sphere projection, make sure far and near clipping are the same, or
   // have a difference that is smaller than is radius
   vec4 pos = flatToSphereProjection(100., vUv, z);
+
+  // top off top
+  // if (pos.y > 0.0) {
+  //   pos.y = 10000.0;
+  // }
+  // pos.y *= 3.0;
   gl_PointSize = pointSize;
   gl_Position = projectionMatrix * modelViewMatrix * pos;
 }
