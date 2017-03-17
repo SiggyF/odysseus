@@ -1,7 +1,7 @@
 <template>
   <div class="v-sphere">
     <canvas class="sphere"></canvas>
-    <video :src="src" autoplay loop controls class="depth"></video>
+    <video :src="src" autoplay loop controls class="depth" v-if="src"></video>
   </div>
 </template>
 

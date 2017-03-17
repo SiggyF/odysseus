@@ -10,7 +10,11 @@ export default {
   name: 'v-sphere',
   props: {
     src: {
-      required: true,
+      required: false,
+      type: String
+    },
+    el: {
+      required: false,
       type: String
     }
   },
@@ -53,7 +57,13 @@ export default {
     },
     video: {
       get() {
-        return $(this.$el).find('.depth')[0];
+        if (this.src) {
+          // if we have src find the element from the template
+          return $(this.$el).find('.depth')[0];
+        } else {
+          // if we have an el element find it in the document
+          return $(this.el)[0];
+        }
       },
       cache: false
     }

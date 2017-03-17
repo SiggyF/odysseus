@@ -19,7 +19,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json', '.glsl', '.scss'],
+    extensions: ['.js', '.vue', '.json', '.glsl', '.styl'],
     modules: [
       resolve('src'),
       resolve('node_modules')
@@ -48,26 +48,43 @@ module.exports = {
         loader: 'vue-loader',
         options: vueLoaderConfig
       },
+      // {
+      //   test: /\.css$/,
+      //   use: [
+      //     {
+      //       loader: 'style-loader' // creates style nodes from JS strings
+      //     },
+      //     {
+      //       loader: 'css-loader' // translates CSS into CommonJS
+      //     }
+      //   ],
+      //   include: [resolve('src')]
+      // },
       {
         test: /\.glsl$/,
         loader: 'webpack-glsl-loader',
         include: [resolve('src'), resolve('shaders')]
       },
-      {
-        test: /\.scss$/,
-        use: [
-          {
-            loader: 'style-loader' // creates style nodes from JS strings
-          },
-          {
-            loader: 'css-loader' // translates CSS into CommonJS
-          },
-          {
-            loader: 'sass-loader' // compiles Sass to CSS
-          }
-        ],
-        include: [resolve('src')]
-      },
+      // {
+      //   test: /\.scss$/,
+      //   use: [
+      //     {
+      //       loader: 'style-loader' // creates style nodes from JS strings
+      //     },
+      //     {
+      //       loader: 'css-loader' // translates CSS into CommonJS
+      //     },
+      //     {
+      //       loader: 'sass-loader' // compiles Sass to CSS
+      //     }
+      //   ],
+      //   include: [resolve('src')]
+      // },
+      // {
+      //   test: /\.styl$/,
+      //   loader: ['style-loader', 'css-loader', 'stylus-loader'],
+      //   include: [resolve('src')]
+      // },
       {
         test: /\.html$/,
         loader: 'html-loader'
